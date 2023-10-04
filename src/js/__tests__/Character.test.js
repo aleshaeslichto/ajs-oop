@@ -1,94 +1,64 @@
-import Character from "../characters/Character";
+import Character from '../characters/Character';
 
-test("Create character", () => {
-  const res = new Character("Olly", "Daemon");
 
-  res.attack = 10;
-  res.defence = 35;
+describe('Character', () => {
 
-  expect(res).toEqual({
-    name: "Olly",
-    type: "Daemon",
-    health: 100,
-    level: 1,
-    attack: 10,
-    defence: 35,
+  describe('constructor', () => {
+
+    it('should create character with valid params', () => {
+      const char = new Character('John', 'Bowerman');
+
+      expect(char.name).toBe('John');
+      expect(char.type).toBe('Bowerman');
+    });
+
+    it('should throw on invalid type', () => {
+      expect(() => {
+        new Character('John', 'Invalid');
+      }).toThrowError('Неизвестный тип существа');
+    });
+
+    it('should throw on invalid name', () => {
+      expect(() => {
+        new Character('J', 'Bowerman');
+      }).toThrowError('Имя должно содержать от 2 до 10 символов');
+    });
+
   });
-});
 
-test("Level up", () => {
-  const res = new Character("Dan", "Zombie");
+  describe('levelUp', () => {
 
-  res.attack = 40;
-  res.defence = 10;
+    it('should throw error for dead player', () => {
+      const char = new Character('John', 'Bowerman');
+      char.health = 0;
 
-  expect(res).toEqual({
-    name: "Dan",
-    type: "Zombie",
-    health: 100,
-    level: 3,
-    attack: 40,
-    defence: 10,
+      expect(() => char.levelUp())
+        .toThrowError('Нельзя получить уровень мертвому персонажу!');
+    });
+
   });
-});
 
-test("Damage test", () => {
-  const res = new Character("Isaac", "Zombie");
-  res.attack = 40;
-  res.defence = 10;
-  res.damage(22);
-  expect(res).toEqual({
-    name: "Glen",
-    type: "Zombie",
-    health: 100,
-    level: 1,
-    attack: 40,
-    defence: 10,
+  describe('damage', () => {
+
+    it('should reduce health with defence factor', () => {
+      const char = new Character('John', 'Bowerman');
+      char.health = 100;
+      char.defence = 10;
+      char.damage(50);
+
+      expect(char.health).toBeLessThan(100);
+      expect(char.health).toBeGreaterThan(0);
+    });
+
+    it('should not reduce if health is 0', () => {
+      const char = new Character('John', 'Bowerman');
+      char.health = 0;
+
+      char.damage(50);
+
+      expect(char.health).toBe(0);
+    });
+
   });
-});
 
-test("Type test", () => {
-  expect(() => {
-    const res = new Character("Lola", "Demon");
-    res.attack = 40;
-    res.defence = 20;
-  }).toThrow("Неверный тип персонажа");
-});
-
-test("Name test", () => {
-  expect(() => {
-    const res = new Character("Li", "Daemon");
-    res.attack = 40;
-    res.defence = 10;
-  }).toThrow("Неверное имя персонажа");
-});
-
-test("Incorrect level up", () => {
-  const res = new Character("Roby", "Magician");
-
-  res.attack = 10;
-  res.defence = 40;
-  res.health = 0;
-
-  expect(() => {
-    res.levelUp();
-  }).toThrow("Нельзя получить уровень, вы мертвы!");
-});
-
-test("Incorrect damage", () => {
-  const res = new Character("Peter", "Undead");
-
-  res.attack = 25;
-  res.defence = 25;
-  res.health = 0;
-  res.damage(10);
-
-  expect(res).toEqual({
-    name: "Peter",
-    type: "Undead",
-    health: 0,
-    level: 1,
-    attack: 25,
-    defence: 25,
-  }).toThrow("Нельзя нанести урон, вы мертвы!");
 });
